@@ -1,6 +1,3 @@
-#include <iostream>
-#include <vector>
-using namespace std
 def sumArray(arr, n):
     s = 0
     for i in range(0, n):

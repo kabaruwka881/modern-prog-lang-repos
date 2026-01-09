@@ -12,14 +12,11 @@ class CppToPythonTranslator:
 
         for line in lines:
             line = line.strip()
-
             if not line or line.startswith("//"):
                 continue
-
             if line == "}":
                 self.indent -= 1
                 continue
-
             py_line = self.translate_line(line)
             if py_line:
                 result.append("    " * self.indent + py_line)
@@ -31,8 +28,6 @@ class CppToPythonTranslator:
 
     def translate_line(self, line: str) -> str:
         line = line.rstrip(";").replace("{", "").strip()
-
-        # ---------- FUNCTIONS ----------
         match = re.match(r"(int|double|void)\s+(\w+)\s*\((.*?)\)", line)
         if match:
             _, name, args = match.groups()
@@ -47,31 +42,25 @@ class CppToPythonTranslator:
 
             return f"def {name}({', '.join(py_args)}):"
 
-        # ---------- VECTOR DECL ----------
-        # vector<int> v;
         match = re.match(r"vector<\w+>\s+(\w+)$", line)
         if match:
             return f"{match.group(1)} = []"
 
-        # vector<int> v(n);
         match = re.match(r"vector<\w+>\s+(\w+)\((.+)\)", line)
         if match:
             name, size = match.groups()
             return f"{name} = [0] * {size}"
 
-        # vector<int> v = {1,2,3};
         match = re.match(r"vector<\w+>\s+(\w+)\s*=\s*\{(.+)\}", line)
         if match:
             name, values = match.groups()
             return f"{name} = [{values}]"
 
-        # ---------- ARRAY (legacy) ----------
         match = re.match(r"(int|double)\s+(\w+)\[(\d+)\]", line)
         if match:
             _, name, size = match.groups()
             return f"{name} = [0] * {size}"
 
-        # ---------- VARIABLE ----------
         match = re.match(r"(int|double)\s+(\w+)\s*=\s*(.+)", line)
         if match:
             _, var, value = match.groups()
@@ -81,28 +70,22 @@ class CppToPythonTranslator:
         if match:
             return f"{match.group(2)} = 0"
 
-        # ---------- INPUT ----------
         match = re.match(r"cin\s*>>\s*(.+)", line)
         if match:
             return f"{match.group(1)} = int(input())"
 
-        # ---------- VECTOR METHODS ----------
-        # v.push_back(x);
         match = re.match(r"(\w+)\.push_back\((.+)\)", line)
         if match:
             v, value = match.groups()
             return f"{v}.append({value})"
 
-        # v.size()
         line = re.sub(r"(\w+)\.size\(\)", r"len(\1)", line)
 
-        # ---------- OUTPUT ----------
         if line.startswith("cout"):
             parts = re.findall(r"<<\s*([^<]+)", line)
             parts = [p.strip() for p in parts if p.strip() != "endl"]
             return f"print({', '.join(parts)})"
 
-        # ---------- IF / ELSE ----------
         match = re.match(r"if\s*\((.+)\)", line)
         if match:
             return f"if {match.group(1)}:"
@@ -114,16 +97,11 @@ class CppToPythonTranslator:
         if line == "else":
             return "else:"
 
-        # ---------- FOR ----------
-        match = re.match(
-            r"for\s*\(\s*int\s+(\w+)\s*=\s*(\d+)\s*;\s*\1\s*<\s*(.+)\s*;\s*\1\+\+\s*\)",
-            line
-        )
+        match = re.match(r"for\s*\(\s*int\s+(\w+)\s*=\s*(\d+)\s*;\s*\1\s*<\s*(.+)\s*;\s*\1\+\+\s*\)", line)
         if match:
             var, start, end = match.groups()
             return f"for {var} in range({start}, {end}):"
 
-        # ---------- RETURN ----------
         match = re.match(r"return\s+(.+)", line)
         if match:
             return f"return {match.group(1)}"

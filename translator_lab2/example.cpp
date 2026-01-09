@@ -1,7 +1,3 @@
-#include <iostream>
-#include <vector>
-using namespace std;
-
 int sumArray(vector<int>& arr, int n) {
     int s = 0;
     for (int i = 0; i < n; i++) {
