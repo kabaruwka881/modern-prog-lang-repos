@@ -1,0 +1,16 @@
+{
+  "table_name": "employees",
+  "columns": [
+    {"name": "id", "type": "int"},
+    {"name": "full_name", "type": "str"},
+    {"name": "age", "type": "int"},
+    {"name": "salary", "type": "float"},
+    {"name": "is_manager", "type": "bool"},
+    {"name": "hire_date", "type": "str"}
+  ],
+  "rows": [
+    [1, "Иван Иванов", 30, 50000.50, true, "2023-01-15"],
+    [2, "Мария Петрова", 25, 60000.75, false, "2022-03-20"],
+    [3, "Алексей Сидоров", 35, 55000.00, true, "2023-11-01"]
+  ]
+}
